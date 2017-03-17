@@ -3,4 +3,5 @@
     <string name="title_home">Profil</string>
     <string name="title_dashboard">Whispers</string>
     <string name="title_notifications">Notifications</string>
+    <string name="rec_button">REC</string>
 </resources>
