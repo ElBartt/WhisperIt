@@ -27,6 +27,7 @@ public class WhisperMenu extends AppCompatActivity {
                     mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
+            mTextMessage.setText("Test Commit");
             return false;
         }
 
