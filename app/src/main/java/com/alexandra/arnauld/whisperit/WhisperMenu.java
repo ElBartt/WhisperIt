@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -17,6 +18,8 @@ import java.io.IOException;
 public class WhisperMenu extends AppCompatActivity {
 
     private TextView mTextMessage;
+
+    //Pour l'enregistrement
     private Button record;
     private static final String AUDIO_RECORDER_FOLDER = "Whispers";
     private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
@@ -25,6 +28,9 @@ public class WhisperMenu extends AppCompatActivity {
     private int currentFormat = 0;
     private int output_formats[] = { MediaRecorder.OutputFormat.MPEG_4, MediaRecorder.OutputFormat.THREE_GPP };
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
+
+    //Declaration pour la progressBar
+    private ProgressBar progressBar;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -56,18 +62,22 @@ public class WhisperMenu extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        final Progres progres = new Progres(progressBar);
+
         record = (Button) findViewById(R.id.button);
         record.setOnTouchListener(new View.OnTouchListener() {
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch(event.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         AppLog.logString("enregistrement commencé");
+                        progres.start();
                         startRecord();
                         break;
                     case MotionEvent.ACTION_UP:
                         AppLog.logString("enregistrement arrêté");
+                        progres.interrupt();
                         stopRecord();
                         break;
                 }
