@@ -1,6 +1,7 @@
 package com.alexandra.arnauld.whisperit;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ public class WhisperMenu extends AppCompatActivity {
     private TextView mTextMessage;
 
     //Pour l'enregistrement
+    private boolean onRecord;
     private Button record;
     private static final String AUDIO_RECORDER_FOLDER = "Whispers";
     private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
@@ -30,7 +32,10 @@ public class WhisperMenu extends AppCompatActivity {
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
 
     //Declaration pour la progressBar
+    private final int TIMER_RUNTIME = 10000;
     private ProgressBar progressBar;
+    private int progressStatus = 0;
+    private Handler handler = new Handler();
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -63,21 +68,24 @@ public class WhisperMenu extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        final Progres progres = new Progres(progressBar);
+        progressBar.setMax(100);
 
         record = (Button) findViewById(R.id.button);
-        record.setOnTouchListener(new View.OnTouchListener() {
+        addRecorderOnButton(record);
+
+    }
+
+    private void addRecorderOnButton(Button bouton){
+        bouton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch(event.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         AppLog.logString("enregistrement commencé");
-                        progres.start();
                         startRecord();
                         break;
                     case MotionEvent.ACTION_UP:
                         AppLog.logString("enregistrement arrêté");
-                        progres.interrupt();
                         stopRecord();
                         break;
                 }
@@ -89,15 +97,29 @@ public class WhisperMenu extends AppCompatActivity {
     private String getFilename(){
         String filepath = Environment.getExternalStorageDirectory().getPath();
         File file = new File(filepath,AUDIO_RECORDER_FOLDER);
-
         if(!file.exists()){
             file.mkdirs();
         }
-
         return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + file_exts[currentFormat]);
     }
 
     private void startRecord() {
+        onRecord = true;
+
+        new Thread(new Runnable() {
+            public void run() {
+                AppLog.logString("Thread record en train de tourner");
+                long debut = System.currentTimeMillis();
+                long fin = System.currentTimeMillis() + TIMER_RUNTIME;
+                long temps;
+                do {
+                    temps = System.currentTimeMillis();
+                    progressBar.setProgress((int) ((progressBar.getMax() * (temps - debut)) / TIMER_RUNTIME));
+                } while (temps < fin && onRecord);
+                stopRecord();
+            }
+        }).start();
+
         enregistreur = new MediaRecorder();
         enregistreur.setAudioSource(MediaRecorder.AudioSource.MIC);
         enregistreur.setOutputFormat(output_formats[currentFormat]);
@@ -117,11 +139,15 @@ public class WhisperMenu extends AppCompatActivity {
     }
 
     private void stopRecord() {
-        if (enregistreur!=null){
+        AppLog.logString("stopRecord : " + onRecord);
+        if (enregistreur!=null && onRecord){
+            AppLog.logString("stopRecord : " + onRecord);
+            onRecord = false;
+            progressStatus = 0;
+            progressBar.setProgress(0);
             enregistreur.stop();
             enregistreur.reset();
             enregistreur.release();
-
             enregistreur = null;
         }
     }

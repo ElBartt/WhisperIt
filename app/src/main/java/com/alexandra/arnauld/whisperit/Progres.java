@@ -40,6 +40,8 @@ class Progres extends Thread {
         }
     }
 
+
+
     @Override
     public void interrupt() {
         super.interrupt();
@@ -56,5 +58,6 @@ class Progres extends Thread {
     }
 
     private void onContinue() {
+        AppLog.logString("onContinue");
     }
 }
