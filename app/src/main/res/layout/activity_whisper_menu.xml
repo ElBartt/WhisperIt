@@ -8,6 +8,12 @@
     android:orientation="vertical"
     tools:context="com.alexandra.arnauld.whisperit.WhisperMenu">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <FrameLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
@@ -32,13 +38,15 @@
             android:layout_marginTop="10dp"
             android:text="@string/rec_button" />
 
-    </FrameLayout>
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="103dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="80dp"
+            android:text="@string/upload" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    </FrameLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
